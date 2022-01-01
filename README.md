@@ -173,21 +173,21 @@ Generate Intermediate CA Key
 
 - if password on key is preferred:
 
-	openssl genrsa -des3 -out intermediate-ca/private/intermediate-ca.key 4096
+	localhost:~/# openssl genrsa -des3 -out intermediate-ca/private/intermediate-ca.key 4096
 
 - if no password on key is preferred:
 
-	openssl genrsa -out intermediate-ca/private/intermediate-ca.key 4096
+	localhost:~/# openssl genrsa -out intermediate-ca/private/intermediate-ca.key 4096
 
 Generate CSR for Intermediate CA
-	openssl req -config intermediate-ca/intermediate-ca.cnf -new -key intermediate-ca/private/intermediate-ca.key -out intermediate-ca/intermediate-ca.csr
+	localhost:~/# openssl req -config intermediate-ca/intermediate-ca.cnf -new -key intermediate-ca/private/intermediate-ca.key -out intermediate-ca/intermediate-ca.csr
 
 Verify CSR
-	openssl req -verify -in intermediate-ca/intermediate-ca.csr -text
+	localhost:~/# openssl req -verify -in intermediate-ca/intermediate-ca.csr -text
 
 Sign the CSR using Root CA
 
-	openssl ca -config root-ca/root-ca.cnf -in intermediate-ca/intermediate-ca.csr -out intermediate-ca/intermediate-ca.pem -extensions intermediate-ca_ext 
+	localhost:~/# openssl ca -config root-ca/root-ca.cnf -in intermediate-ca/intermediate-ca.csr -out intermediate-ca/intermediate-ca.pem -extensions intermediate-ca_ext 
 	Using configuration from root-ca/root-ca.cnf
 	Check that the request matches the signature
 	Signature ok
@@ -227,10 +227,84 @@ Sign the CSR using Root CA
 
 Verify the Intermediate CA
 
-	openssl x509 -in intermediate-ca/intermediate-ca.pem -subject -noout
+	localhost:~/# openssl x509 -in intermediate-ca/intermediate-ca.pem -subject -noout
 	subject=O = Local Environment, CN = Local Environment Intermediate CA
 	
-	openssl x509 -in intermediate-ca/intermediate-ca.pem -issuer -noout
+	localhost:~/# openssl x509 -in intermediate-ca/intermediate-ca.pem -issuer -noout
 	issuer=O = Local Environment, CN = Local Environment Root CA
+
+## Create Self-Signed Certificate with Local Environment CA
+In this howto, we will generate certificate for wildcard domain: *.nhadzter.local 
+
+Prepare directories for self-signed certificate
+
+	localhost:~/# mkdir -p nhadzter.local/{private,public,request}
+
+Generate Key and CSR for self-signed certificates:
+
+	localhost:~/# openssl req -new -nodes -days 365 -keyout nhadzter.local/private/nhadzter.local.key -out nhadzter.local/request/nhadzter.local.csr
+	Ignoring -days; not generating a certificate
+	Generating a RSA private key
+	.......................................................+++++
+	..............+++++
+	writing new private key to 'nhadzter.local/private/nhadzter.local.key'
+	-----
+	You are about to be asked to enter information that will be incorporated
+	into your certificate request.
+	What you are about to enter is what is called a Distinguished Name or a DN.
+	There are quite a few fields but you can leave some blank
+	For some fields there will be a default value,
+	If you enter '.', the field will be left blank.
+	-----
+	Country Name (2 letter code) [AU]:LE
+	State or Province Name (full name) [Some-State]:
+	Locality Name (eg, city) []:
+	Organization Name (eg, company) [Internet Widgits Pty Ltd]:Nhadzter Local
+	Organizational Unit Name (eg, section) []:
+	Common Name (e.g. server FQDN or YOUR name) []:*.nhadzter.local
+	Email Address []:me@nhadzter.local
+	
+	Please enter the following 'extra' attributes
+	to be sent with your certificate request
+	A challenge password []:
+	An optional company name []:
+
+Sign the CSR using Intermediate CA
+
+	localhost:~/# openssl ca -config intermediate-ca/intermediate-ca.cnf -in nhadzter.local/request/nhadzter.local.csr -out nhadzter.local/public/nhadzter.local.pem
+	Using configuration from intermediate-ca/intermediate-ca.cnf
+	Check that the request matches the signature
+	Signature ok
+	Certificate Details:
+	Certificate:
+	    Data:
+	        Version: 1 (0x0)
+	        Serial Number:
+	            10:e7:b8:c4:29:3e:b9:dd:9b:fe:0c:cf:a8:44:af:42
+	        Issuer:
+	            organizationName          = Local Environment
+	            commonName                = Local Environment Intermediate CA
+	        Validity
+	            Not Before: Jan  1 17:54:33 2022 GMT
+	            Not After : Feb  1 17:54:33 2023 GMT
+	        Subject:
+	            countryName               = LE
+	            stateOrProvinceName       = Some-State
+	            organizationName          = Nhadzter Local
+	            commonName                = *.nhadzter.local
+	Certificate is to be certified until Feb  1 17:54:33 2023 GMT (396 days)
+	Sign the certificate? [y/n]:y
+	
+	1 out of 1 certificate requests certified, commit? [y/n]y
+	Write out database with 1 new entries
+	Data Base Updated
+
+Verify certificate:
+
+	localhost:~/# openssl x509 -in nhadzter.local/public/nhadzter.local.pem -subject -noout
+	subject=C = LE, ST = Some-State, O = Nhadzter Local, CN = *.nhadzter.local
+	
+	localhost:~/# openssl x509 -in nhadzter.local/public/nhadzter.local.pem -issuer -noout
+	issuer=O = Local Environment, CN = Local Environment Intermediate CA
 
 
