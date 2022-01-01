@@ -19,9 +19,11 @@ Using random instead of incremental serial numbers is a recommended security pra
 
 Generate Root CA Key
 - if password on key is preferred:
+
 	localhost:~/# openssl genrsa -des3 -out root-ca/private/root-ca.key 4096
 
 - if no password on key is preferred:
+
 	localhost:~/# openssl genrsa -out root-ca/private/root-ca.key 4096
 
 Generate Root CA Certificate
