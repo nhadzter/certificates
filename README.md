@@ -143,3 +143,23 @@ verify certificate:
 	(stdin)= 3c4ea5d857189c64d946ef1fb7e5f177
 
 ## Create Intermediate Certificate Authority
+
+This is an optional step, certificates can already be signed using the Root CA.
+
+Prepare Directories for Intermediate CA
+
+	localhost:~/# mkdir -p intermediate-ca/{certreqs,certs,crl,newcerts,private}
+
+Tracking of issued certificates, their serial numbers and revocations
+
+	localhost:~/# touch intermediate-ca/intermediate-ca.index
+	localhost:~/# echo 00 > intermediate-ca/intermediate-ca.crlnum
+	localhost:~/# touch intermediate-ca/intermediate-ca.rnd
+
+Create the serial file, to store next incremental serial number
+Using random instead of incremental serial numbers is a recommended security practice.
+
+	localhost:~/# openssl rand -hex 16 > intermediate-ca/intermediate-ca.serial
+
+
+
