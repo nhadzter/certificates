@@ -46,6 +46,89 @@ You can request a certificate and entering values required on the prompt:
 	Common Name (e.g. server FQDN or YOUR name) []:`Local Environment Root CA`
 	Email Address []:your@email.com`
 
-	localhost:~/# openssl req -x509 -config root-ca/root-ca.cnf -new -nodes -key root-ca/private/root-ca.key -sha256 -days 3650 -out root-ca/root-ca.pem`
+	localhost:~/# openssl req -x509 -config root-ca/root-ca.cnf -new -nodes -key root-ca/private/root-ca.key -days 3650 -out root-ca/root-ca.pem`
+
+Or, create an openssl configuration and define the values:
+
+	localhost:~/# cat root-ca/root-ca.cnf 
+	#
+	# OpenSSL configuration for the Root Certification Authority.
+	#
+	RANDFILE                = ./root-ca/root-ca.rnd
+	
+	# Default Certification Authority
+	[ ca ]
+	default_ca              = root_ca
+	
+	#
+	# Root Certification Authority
+	[ root_ca ]
+	dir                     = ./root-ca
+	certs                   = $dir/certs
+	serial                  = $dir/root-ca.serial
+	database                = $dir/root-ca.index
+	new_certs_dir           = $dir/newcerts
+	certificate             = $dir/root-ca.cert.pem
+	private_key             = $dir/private/root-ca.key
+	default_days            = 1826 # 5 years
+	crl                     = $dir/root-ca.crl
+	crl_dir                 = $dir/crl
+	crlnumber               = $dir/root-ca.crlnum
+	name_opt                = multiline, align
+	cert_opt                = no_pubkey
+	copy_extensions         = copy
+	crl_extensions          = crl_ext
+	default_crl_days        = 180
+	default_md              = sha384
+	preserve                = no
+	email_in_dn             = no
+	policy                  = policy
+	unique_subject          = no
+	
+	# Distinguished Name Policy for CAs
+	[ policy ]
+	countryName             = optional
+	stateOrProvinceName     = optional
+	localityName            = optional
+	organizationName        = supplied
+	organizationalUnitName  = optional
+	commonName              = supplied
+	
+	# Root CA Request Options
+	[ req ]
+	dir                     = ./root-ca
+	default_bits            = 4096
+	encrypt_key             = yes
+	default_md              = sha256
+	string_mask             = utf8only
+	utf8                    = yes
+	prompt                  = no
+	distinguished_name      = distinguished_name
+	
+	# Distinguished Name (DN)
+	[ distinguished_name ]
+	organizationName        = Local Environment
+	commonName              = Local Environment Root CA
+	
+	#
+	# Root CA Certificate Extensions
+	[ root-ca_ext ]
+	basicConstraints        = critical, CA:true
+	keyUsage                = critical, keyCertSign, cRLSign
+	nameConstraints         = critical, @name_constraints
+	subjectKeyIdentifier    = hash
+	authorityKeyIdentifier  = keyid:always
+	issuerAltName           = issuer:copy
+	
+	# CRL Certificate Extensions
+	[ crl_ext ]
+	authorityKeyIdentifier  = keyid:always
+	issuerAltName           = issuer:copy
+	
+	# EOF
+
+and request for the certificate:
+
+	localhost:~/# openssl req -x509 -config root-ca/root-ca.cnf -new -nodes -key root-ca/private/root-ca.key -days 3650 -out root-ca/root-ca.pem
 
 ## Create Intermediate Certificate Authority
