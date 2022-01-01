@@ -110,7 +110,6 @@ Or, create an openssl configuration and define the values:
 	organizationName        = Local Environment
 	commonName              = Local Environment Root CA
 	
-	#
 	# Root CA Certificate Extensions
 	[ root-ca_ext ]
 	basicConstraints        = critical, CA:true
@@ -119,6 +118,15 @@ Or, create an openssl configuration and define the values:
 	subjectKeyIdentifier    = hash
 	authorityKeyIdentifier  = keyid:always
 	issuerAltName           = issuer:copy
+
+	# Intermediate CA Certificate Extensions
+	[ intermediate-ca_ext ]
+	basicConstraints        = critical, CA:true, pathlen:0
+	keyUsage                = critical, keyCertSign, cRLSign
+	subjectKeyIdentifier    = hash
+	authorityKeyIdentifier  = keyid:always
+	issuerAltName           = issuer:copy
+	crlDistributionPoints   = crl_dist
 	
 	# CRL Certificate Extensions
 	[ crl_ext ]
@@ -161,5 +169,68 @@ Using random instead of incremental serial numbers is a recommended security pra
 
 	localhost:~/# openssl rand -hex 16 > intermediate-ca/intermediate-ca.serial
 
+Generate Intermediate CA Key
+
+- if password on key is preferred:
+
+	openssl genrsa -des3 -out intermediate-ca/private/intermediate-ca.key 4096
+
+- if no password on key is preferred:
+
+	openssl genrsa -out intermediate-ca/private/intermediate-ca.key 4096
+
+Generate CSR for Intermediate CA
+	openssl req -config intermediate-ca/intermediate-ca.cnf -new -key intermediate-ca/private/intermediate-ca.key -out intermediate-ca/intermediate-ca.csr
+
+Verify CSR
+	openssl req -verify -in intermediate-ca/intermediate-ca.csr -text
+
+Sign the CSR using Root CA
+
+	openssl ca -config root-ca/root-ca.cnf -in intermediate-ca/intermediate-ca.csr -out intermediate-ca/intermediate-ca.pem -extensions intermediate-ca_ext 
+	Using configuration from root-ca/root-ca.cnf
+	Check that the request matches the signature
+	Signature ok
+	Certificate Details:
+	Certificate:
+	    Data:
+	        Version: 3 (0x2)
+	        Serial Number:
+	            9a:3e:1e:aa:1d:b7:68:e0:39:5b:cd:a2:bf:13:88:c5
+	        Issuer:
+	            organizationName          = Local Environment
+	            commonName                = Local Environment Root CA
+	        Validity
+	            Not Before: Jan  1 16:13:12 2022 GMT
+	            Not After : Jan  1 16:13:12 2027 GMT
+	        Subject:
+	            organizationName          = Local Environment
+	            commonName                = Local Environment Intermediate CA
+	        X509v3 extensions:
+	            X509v3 Basic Constraints: critical
+	                CA:TRUE, pathlen:0
+	            X509v3 Key Usage: critical
+	                Certificate Sign, CRL Sign
+	            X509v3 Subject Key Identifier: 
+	                6D:CB:96:1F:03:29:2A:6D:61:A1:C7:AF:A5:3C:D2:6D:35:D7:B4:4D
+	            X509v3 Authority Key Identifier: 
+	                0.
+	            X509v3 Issuer Alternative Name: 
+	                <EMPTY>
+	
+	Certificate is to be certified until Jan  1 16:13:12 2027 GMT (1826 days)
+	Sign the certificate? [y/n]:
+	
+	1 out of 1 certificate requests certified, commit? [y/n]y
+	Write out database with 1 new entries
+	Data Base Updated
+
+Verify the Intermediate CA
+
+	openssl x509 -in intermediate-ca/intermediate-ca.pem -subject -noout
+	subject=O = Local Environment, CN = Local Environment Intermediate CA
+	
+	openssl x509 -in intermediate-ca/intermediate-ca.pem -issuer -noout
+	issuer=O = Local Environment, CN = Local Environment Root CA
 
 
