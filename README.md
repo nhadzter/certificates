@@ -9,6 +9,7 @@ Prepare Directories for Root CA
 Tracking of issued certificates, their serial numbers and revocations
 
 `localhost:~/# touch root-ca/root-ca.index`
+
 `localhost:~/# echo 00 > root-ca/root-ca.crlnum`
 
 Create the serial file, to store next incremental serial number
