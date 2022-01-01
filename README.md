@@ -131,4 +131,15 @@ and request for the certificate:
 
 	localhost:~/# openssl req -x509 -config root-ca/root-ca.cnf -new -nodes -key root-ca/private/root-ca.key -days 3650 -out root-ca/root-ca.pem
 
+verify certificate:
+
+	localhost:~/# openssl x509 -in root-ca/test-config-root-ca.pem -subject -noout
+	subject=O = Local Environment, CN = Local Environment Root CA
+
+	localhost:~/# openssl rsa -modulus -noout -in root-ca/private/root-ca.key | openssl md5
+	(stdin)= 3c4ea5d857189c64d946ef1fb7e5f177
+
+	localhost:~/# openssl x509 -modulus -noout -in root-ca/root-ca.pem | openssl md5
+	(stdin)= 3c4ea5d857189c64d946ef1fb7e5f177
+
 ## Create Intermediate Certificate Authority
