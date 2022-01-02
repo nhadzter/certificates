@@ -307,4 +307,5 @@ Verify certificate:
 	localhost:~/# openssl x509 -in nhadzter.local/public/nhadzter.local.pem -issuer -noout
 	issuer=O = Local Environment, CN = Local Environment Intermediate CA
 
-
+## References
+- https://roll.urown.net/ca/index.html
