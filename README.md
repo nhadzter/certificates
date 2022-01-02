@@ -114,7 +114,6 @@ Or, create an openssl configuration and define the values:
 	[ root-ca_ext ]
 	basicConstraints        = critical, CA:true
 	keyUsage                = critical, keyCertSign, cRLSign
-	nameConstraints         = critical, @name_constraints
 	subjectKeyIdentifier    = hash
 	authorityKeyIdentifier  = keyid:always
 	issuerAltName           = issuer:copy
@@ -137,7 +136,7 @@ Or, create an openssl configuration and define the values:
 
 and request for the certificate:
 
-	localhost:~/# openssl req -x509 -config root-ca/root-ca.cnf -new -nodes -key root-ca/private/root-ca.key -days 3650 -out root-ca/root-ca.pem
+	localhost:~/# openssl req -x509 -config root-ca/root-ca.cnf -new -nodes -key root-ca/private/root-ca.key -days 3650 -out root-ca/root-ca.pem -extensions root-ca_ext
 
 verify certificate:
 
