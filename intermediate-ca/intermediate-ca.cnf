@@ -88,34 +88,29 @@ commonName              = Local Environment Intermediate CA
 #
 # Server Certificate Extensions
 [ server_ext ]
-keyUsage                = critical, digitalSignature, keyEncipherment
-extendedKeyUsage        = critical, serverAuth, clientAuth
+keyUsage                = digitalSignature, keyEncipherment
+extendedKeyUsage        = serverAuth, clientAuth
 subjectKeyIdentifier    = hash
 authorityKeyIdentifier  = keyid:always
-issuerAltName           = issuer:copy
 crlDistributionPoints   = crl_dist
 
 # Client Certificate Extensions
 [ client_ext ]
-keyUsage                = critical, digitalSignature
-extendedKeyUsage        = critical, clientAuth
+keyUsage                = digitalSignature
+extendedKeyUsage        = clientAuth
 subjectKeyIdentifier    = hash
 authorityKeyIdentifier  = keyid:always
-issuerAltName           = issuer:copy
 crlDistributionPoints   = crl_dist
 
 # User Certificate Extensions
 [ user_ext ]
-keyUsage                = critical, digitalSignature
-extendedKeyUsage        = critical, clientAuth, emailProtection
+keyUsage                = digitalSignature
+extendedKeyUsage        = clientAuth, emailProtection
 subjectKeyIdentifier    = hash
-authorityKeyIdentifier  = keyid:always
-issuerAltName           = issuer:copy
 crlDistributionPoints   = crl_dist
 
 # CRL Certificate Extensions
 [ crl_ext ]
 authorityKeyIdentifier  = keyid:always
-issuerAltName           = issuer:copy
 
 # EOF
