@@ -112,25 +112,22 @@ Or, create an openssl configuration and define the values:
 	
 	# Root CA Certificate Extensions
 	[ root-ca_ext ]
-	basicConstraints        = critical, CA:true
-	keyUsage                = critical, keyCertSign, cRLSign
+	basicConstraints        = CA:true
+	keyUsage                = keyCertSign, cRLSign
 	subjectKeyIdentifier    = hash
 	authorityKeyIdentifier  = keyid:always
-	issuerAltName           = issuer:copy
 
 	# Intermediate CA Certificate Extensions
 	[ intermediate-ca_ext ]
-	basicConstraints        = critical, CA:true, pathlen:0
-	keyUsage                = critical, keyCertSign, cRLSign
+	basicConstraints        = CA:true, pathlen:0
+	keyUsage                = keyCertSign, cRLSign
 	subjectKeyIdentifier    = hash
 	authorityKeyIdentifier  = keyid:always
-	issuerAltName           = issuer:copy
 	crlDistributionPoints   = crl_dist
 	
 	# CRL Certificate Extensions
 	[ crl_ext ]
 	authorityKeyIdentifier  = keyid:always
-	issuerAltName           = issuer:copy
 	
 	# EOF
 
